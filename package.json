@@ -1,0 +1,10 @@
+{
+    "name": "intellichat",
+    "version": "0.0.1",
+    "description": "IntelliChat, the intelligent messaging platform",
+    "type": "module",
+    "dependencies": {
+        "express": "^4.21.2",
+        "socket.io": "^4.8.1"
+    }
+}
