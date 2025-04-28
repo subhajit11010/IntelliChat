@@ -6,6 +6,7 @@
     <title>Socket.IO chat</title>
     <link href="./public/style.css" rel="stylesheet">
     <link href="https://fonts.cdnfonts.com/css/segoe-ui-4" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 </head>
 
@@ -19,15 +20,17 @@
     </div>
 
 
-    <div class="chat-container">
+    <div class="chat-container" id="chat-container">
         <div id="navigation-con">
             <div id="logo"></div>
             <div id="online-users"><span class="online-show">&#9679;</span> 0 online</div>
         </div>
-        <div id="date-time"></div>
-        <div id="about">Welcome to IntelliChat!! Here you will find like minded techies!! Please keep the messages friendly. Do not use slangs.</div>
-        <div class="messages" id="messages"></div>
-        <div></div>
+
+        <div class="messages" id="messages">
+            <div id="date-time"></div>
+            <div id="about">Welcome to IntelliChat!! Here you will find like minded techies!! Please keep the messages
+                friendly. Do not use slangs.</div>
+        </div>
         <form id="form" class="input-area">
             <input id="input" autocomplete="off" placeholder="Type your message..." />
             <button>Send</button>

@@ -23,17 +23,27 @@ io.on('connection', (socket) => {
     io.emit('users count', users);
     console.log("A user connected!");
 
+    socket.on("register user", (userID) => {
+        socket.userID = userID;
+    });
+
     // handle new user joining
     socket.on("new user", (username) => {
         socket.username = username;
         console.log(`${username} joined the chat`);
-        socket.broadcast.emit('user joined', username); 
+        socket.broadcast.emit('user joined', username);
         // send to everyone except the sender
     });
 
-    socket.on("chat message", (msg, username) => {
-        console.log('message: ' + msg);
-        socket.broadcast.emit('chat message', msg, username);
+    socket.on("chat message", (msg, username, reply_receiver, messageId, refmsg, senderID, targetID) => {
+        console.log('SERVER received:');
+        console.log('msg:', msg);
+        console.log('username:', username);
+        console.log('messageId:', messageId);
+        console.log('refmsg:', refmsg);
+        console.log('senderID:', senderID);
+        console.log('targetID:', targetID);
+        socket.broadcast.emit('chat message', msg, username, reply_receiver, messageId, refmsg, senderID, targetID);
     });
 
     socket.on("disconnect", () => {
@@ -43,6 +53,11 @@ io.on('connection', (socket) => {
             socket.broadcast.emit('user left', socket.username);
         }
         console.log("User disconnected!");
+    });
+
+    socket.on("delete message", (messageId, userID) => {
+        console.log(userID);
+        io.emit("delete message", messageId, userID);
     });
 });
 

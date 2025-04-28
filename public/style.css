@@ -48,9 +48,44 @@
         border-bottom-right-radius: 2px;
     }
 
-    .message.received{
+    .message.sent.enclosed {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .message.received {
         border-bottom-left-radius: 2px;
     }
+
+    .message.received.enclosed {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .deleted-sender {
+        border-radius: 30px;
+        color: #d3d3d3;
+        background-color: rgb(142, 142, 142);
+        padding: 0.8rem;
+        padding-top: 0.4rem;
+        padding-bottom: 0.4rem;
+        width: fit-content;
+        align-self: flex-end;
+        font-style: italic;
+    }
+
+    .deleted-receiver {
+        border-radius: 30px;
+        color: #d3d3d3;
+        background-color: rgb(142, 142, 142);
+        padding: 0.8rem;
+        padding-top: 0.4rem;
+        padding-bottom: 0.4rem;
+        width: fit-content;
+        align-self: flex-start;
+        font-style: italic;
+    }
+
     .input-area {
         display: flex;
         padding: 10px;
@@ -123,22 +158,218 @@
         margin-right: 0.6rem;
     }
 
-    #chat-name-icon-con{
+    #chat-name-icon-con {
         display: flex;
         flex-direction: row;
         align-items: center;
+        flex-shrink: 1;
+        min-width: 0;
     }
 
-    #chat-header{
+    #chat-header {
         display: flex;
         width: 100%;
         justify-content: space-between;
-        margin-bottom: 1rem;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        flex-wrap: nowrap;
     }
 
-    #chat-time{
-        margin-left: 0.6rem;
+    #chat-name {
+        width: auto;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-weight: bold;
     }
+
+    #chat-time {
+        margin-left: 0.5rem;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        /* prevent time from breaking */
+        flex-shrink: 0;
+    }
+
+    #chat-utils {
+        display: flex;
+        flex-direction: row;
+        margin-top: 0.7rem;
+        /* border: 1px solid black; */
+        justify-content: space-between;
+    }
+
+    .message:hover #chat-delete,
+    .message:hover .chat-reply {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    #chat-delete {
+        background-color: transparent;
+        color: white;
+        outline: none;
+        border: none;
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 0.3s ease, font-size 0.3s ease, opacity 0.3s ease-in-out;
+    }
+
+    #chat-delete:hover {
+        transform: scale(1.1);
+        font-size: 1.1em;
+    }
+
+    .chat-reply {
+        background-color: transparent;
+        color: white;
+        outline: none;
+        border: none;
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 0.3s ease, font-size 0.3s ease, opacity 0.3s ease-in-out;
+    }
+
+    .chat-reply:hover {
+        transform: scale(1.1);
+        font-size: 1.1em;
+    }
+
+    #chat-reply-received {
+        color: black;
+    }
+
+    #reply-to {
+        padding: 0.7rem;
+        background-color: rgba(0, 123, 255, 0.7);
+        color: white;
+        margin: 0.2rem 0.5rem 0.2rem 0.5rem;
+        border-left: 8px solid rgb(0, 20, 204);
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        position: relative;
+    }
+
+    #reply-to-msg {
+        width: fit-content;
+        max-width: 50%;
+        /* You can adjust this depending on your layout */
+        white-space: nowrap;
+        /* Prevent wrapping */
+        overflow: hidden;
+        /* Hide overflowed content */
+        text-overflow: ellipsis;
+        /* Show ellipsis when text is too long */
+        font-size: 12px;
+        /* Optional, adjust as needed */
+    }
+
+    #reply-to-name {
+        font-weight: bold;
+        font-size: 17px;
+    }
+
+    #reply-to-delete {
+        color: rgb(0, 29, 144);
+        position: absolute;
+        /* VERY IMPORTANT */
+        top: 8px;
+        /* small gap from top */
+        right: 8px;
+        /* small gap from right */
+        cursor: pointer;
+    }
+
+    .reply.sent {
+        display: flex;
+        flex-direction: column;
+        align-self: flex-end;
+        justify-content: flex-end;
+        max-width: 70%;
+        padding-right: 0px;
+        background-color: #007BFF;
+        border-top-right-radius: 20px;
+        border-top-left-radius: 20px;
+    }
+
+    .reply.received {
+        display: flex;
+        flex-direction: column;
+        align-self: flex-start;
+        justify-content: flex-end;
+        max-width: 70%;
+        padding-right: 0.6rem;
+        padding-left: 0.6rem;
+        background-color: #f1f0f0;
+        border-top-right-radius: 20px;
+        border-top-left-radius: 20px;
+    }
+
+    .reply-info {
+        display: flex;
+        flex-direction: column;
+        width: 80%;
+        margin: 0.3rem;
+        background-color: #4ca3ff;
+        padding-right: 0.6rem;
+        border-radius: 20px;
+        margin: 0.5rem;
+        align-self: center;
+    }
+
+    .reply-info.received {
+        align-self: center;
+        padding-left: 0.6rem;
+        padding-right: 0.6rem;
+        background-color: #a4a3a3;
+        border-radius: 20px;
+        margin: 0.5rem;
+
+    }
+
+    .reply-message {
+        width: 100%;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .reference-message {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        max-width: 100%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        padding-left: 1rem;
+
+    }
+
+    .reference-message.received {
+        justify-content: flex-start;
+        padding-left: 0.4rem;
+    }
+
+    .replying-to {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        max-width: 100%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        padding-left: 0.5rem;
+    }
+
+    .replying-to.received {
+        justify-content: flex-start;
+        padding-left: 0.4rem;
+    }
+
     .online-show {
         color: rgb(0, 255, 0);
         margin-right: 0.2rem;
