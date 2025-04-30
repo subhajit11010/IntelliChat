@@ -39,6 +39,8 @@
         max-width: 70%;
         align-self: flex-start;
         animation: fadeIn 0.3s ease;
+        display: flex;
+        flex-direction: column;
     }
 
     .message.sent {
@@ -48,18 +50,13 @@
         border-bottom-right-radius: 2px;
     }
 
-    .message.sent.enclosed {
-        width: 100%;
-        max-width: 100%;
-    }
-
     .message.received {
         border-bottom-left-radius: 2px;
     }
 
-    .message.received.enclosed {
-        width: 100%;
-        max-width: 100%;
+    .highlight {
+        background-color: yellow;
+        transition: background-color 0.8s ease-in-out;
     }
 
     .deleted-sender {
@@ -288,7 +285,8 @@
         flex-direction: column;
         align-self: flex-end;
         justify-content: flex-end;
-        max-width: 70%;
+        align-items: flex-start;
+        width: 100%;
         padding-right: 0px;
         background-color: #007BFF;
         border-top-right-radius: 20px;
@@ -300,9 +298,8 @@
         flex-direction: column;
         align-self: flex-start;
         justify-content: flex-end;
-        max-width: 70%;
-        padding-right: 0.6rem;
-        padding-left: 0.6rem;
+        width: 100%;
+        padding-left: 0px;
         background-color: #f1f0f0;
         border-top-right-radius: 20px;
         border-top-left-radius: 20px;
@@ -311,7 +308,7 @@
     .reply-info {
         display: flex;
         flex-direction: column;
-        width: 80%;
+        width: 100%;
         margin: 0.3rem;
         background-color: #4ca3ff;
         padding-right: 0.6rem;
@@ -322,25 +319,16 @@
 
     .reply-info.received {
         align-self: center;
-        padding-left: 0.6rem;
-        padding-right: 0.6rem;
         background-color: #a4a3a3;
         border-radius: 20px;
         margin: 0.5rem;
 
     }
 
-    .reply-message {
-        width: 100%;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
     .reference-message {
         display: flex;
         flex-direction: row;
-        justify-content: flex-end;
+        justify-content: flex-start;
         max-width: 100%;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -351,23 +339,21 @@
 
     .reference-message.received {
         justify-content: flex-start;
-        padding-left: 0.4rem;
     }
 
     .replying-to {
         display: flex;
         flex-direction: row;
-        justify-content: flex-end;
+        justify-content: flex-start;
         max-width: 100%;
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
-        padding-left: 0.5rem;
+        padding-left: 1rem;
     }
 
     .replying-to.received {
         justify-content: flex-start;
-        padding-left: 0.4rem;
     }
 
     .online-show {

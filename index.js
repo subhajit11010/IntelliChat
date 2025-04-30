@@ -35,15 +35,16 @@ io.on('connection', (socket) => {
         // send to everyone except the sender
     });
 
-    socket.on("chat message", (msg, username, reply_receiver, messageId, refmsg, senderID, targetID) => {
+    socket.on("chat message", (msg, username, reply_receiver, messageId, reply_messageId, refmsg, senderID, targetID) => {
         console.log('SERVER received:');
         console.log('msg:', msg);
         console.log('username:', username);
         console.log('messageId:', messageId);
+        console.log('reply messageID: ', reply_messageId);
         console.log('refmsg:', refmsg);
         console.log('senderID:', senderID);
         console.log('targetID:', targetID);
-        socket.broadcast.emit('chat message', msg, username, reply_receiver, messageId, refmsg, senderID, targetID);
+        socket.broadcast.emit('chat message', msg, username, reply_receiver, messageId, reply_messageId, refmsg, senderID, targetID);
     });
 
     socket.on("disconnect", () => {

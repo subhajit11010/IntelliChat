@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const userID = generateShortUUID();
     let targetID = "";
     let currentReplyMessageId = null; // this is global
+    // let reply_messageId = null;
     socket.emit('register user', userID);
 
     const chat_container = document.getElementById('chat-container');
@@ -49,9 +50,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const messageId = Date.now() + Math.random().toString(36).substr(2, 5);
 
             if (currentReplyMessageId === null) {
-                socket.emit('chat message', input.value.trim(), username, "", messageId, "", userID, targetID || "");
+                socket.emit('chat message', input.value.trim(), username, "", messageId, "", "", userID, targetID || "");
                 const item = document.createElement('div');
                 item.dataset.id = messageId;
+                item.setAttribute('tabindex', '0');
                 const chat_header = document.createElement('div');
                 chat_header.id = "chat-header";
                 const chat_name = document.createElement('div');
@@ -69,6 +71,75 @@ document.addEventListener("DOMContentLoaded", () => {
                 chat_delete.id = "chat-delete";
                 const chat_reply = document.createElement('button');
                 chat_reply.id = "chat-reply-sent";
+
+                chat_reply.addEventListener('click', () => {
+                    // console.log("Ok");
+                    targetID = userID;
+                    const top_level_parentId = chat_reply.parentNode.parentNode.dataset.id;
+                    const self_message_parent = chat_reply.parentNode.parentNode;
+                    let self_message = "";
+                    if (self_message_parent.children.length === 4) {
+                        self_message = self_message_parent.childNodes[2].textContent;
+                    }
+                    else {
+                        self_message = self_message_parent.childNodes[1].textContent;
+                    }
+
+                    if (document.getElementById("reply-to") === null) {
+                        const reply_to = document.createElement('div');
+                        reply_to.id = 'reply-to';
+                        const reply_to_name = document.createElement('div');
+                        reply_to_name.id = 'reply-to-name';
+                        const reply_to_msg = document.createElement('div');
+                        reply_to_msg.id = 'reply-to-msg';
+                        const reply_to_delete = document.createElement('i');
+                        reply_to_delete.id = 'reply-to-delete';
+                        reply_to_delete.classList.add("fa", "fa-close");
+
+                        reply_to_delete.addEventListener('click', () => {
+                            reply_to.remove();
+                            currentReplyMessageId = null;
+                            targetID = "";
+                        });
+
+                        reply_to_name.textContent = "You";
+                        reply_to_msg.textContent = self_message;
+                        reply_to.appendChild(reply_to_name);
+                        reply_to.appendChild(reply_to_msg);
+                        reply_to.appendChild(reply_to_delete);
+
+                        chat_container.insertBefore(reply_to, form);
+                        currentReplyMessageId = top_level_parentId;
+                    }
+                    else if (top_level_parentId !== currentReplyMessageId) {
+                        let reply_to = document.getElementById("reply-to");
+                        reply_to.remove();
+                        reply_to = document.createElement('div');
+                        reply_to.id = 'reply-to';
+                        const reply_to_name = document.createElement('div');
+                        reply_to_name.id = 'reply-to-name';
+                        const reply_to_msg = document.createElement('div');
+                        reply_to_msg.id = 'reply-to-msg';
+                        const reply_to_delete = document.createElement('i');
+                        reply_to_delete.id = 'reply-to-delete';
+                        reply_to_delete.classList.add("fa", "fa-close");
+
+                        reply_to_delete.addEventListener('click', () => {
+                            reply_to.remove();
+                            currentReplyMessageId = null;
+                            targetID = "";
+                        });
+
+                        reply_to_name.textContent = "You";
+                        reply_to_msg.textContent = self_message;
+                        reply_to.appendChild(reply_to_name);
+                        reply_to.appendChild(reply_to_msg);
+                        reply_to.appendChild(reply_to_delete);
+
+                        chat_container.insertBefore(reply_to, form);
+                        currentReplyMessageId = top_level_parentId;
+                    }
+                });
 
                 chat_delete.addEventListener('click', () => {
                     console.log(userID);
@@ -102,8 +173,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 const reference_message_elem = document.querySelector(`[data-id="${currentReplyMessageId}"]`);
                 const reply = document.createElement('div');
                 reply.classList.add("reply", "sent");
-                const reply_message = document.createElement('div');
-                reply_message.classList.add("reply-message");
                 const reply_info = document.createElement('div');
                 reply_info.classList.add("reply-info");
                 const replying_to = document.createElement('div');
@@ -113,12 +182,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 replying_to.textContent = reference_message_elem.childNodes[0].childNodes[0].childNodes[1].textContent;
                 console.log(replying_to.textContent);
-                reference_message.textContent = reference_message_elem.childNodes[1].textContent;
+                if (reference_message_elem.children.length === 4) {
+                    reference_message.textContent = reference_message_elem.childNodes[2].textContent;
+                }
+                else {
+                    reference_message.textContent = reference_message_elem.childNodes[1].textContent;
+                }
+
                 const refmsg = reference_message.textContent;
-                socket.emit('chat message', input.value.trim(), username, replying_to.textContent, messageId, refmsg, userID, targetID);
+                socket.emit('chat message', input.value.trim(), username, replying_to.textContent, messageId, currentReplyMessageId, refmsg, userID, targetID);
+
+                reply_info.appendChild(replying_to);
+                reply_info.appendChild(reference_message);
+                reply.appendChild(reply_info);
+
+                reply.addEventListener('click', () => {
+                    reference_message_elem.focus();
+                    reference_message_elem.classList.add("highlight");
+
+                    setTimeout(() => {
+                        reference_message_elem.classList.remove("highlight");
+                    }, 2000);
+                });
 
                 const item = document.createElement('div');
                 item.dataset.id = messageId;
+                item.setAttribute('tabindex', '0');
                 const chat_header = document.createElement('div');
                 chat_header.id = "chat-header";
                 const chat_name = document.createElement('div');
@@ -136,6 +225,76 @@ document.addEventListener("DOMContentLoaded", () => {
                 chat_delete.id = "chat-delete";
                 const chat_reply = document.createElement('button');
                 chat_reply.id = "chat-reply-sent";
+
+                chat_reply.addEventListener('click', () => {
+                    // console.log("Ok");
+                    targetID = userID;
+                    const top_level_parentId = chat_reply.parentNode.parentNode.dataset.id;
+                    const self_message_parent = chat_reply.parentNode.parentNode;
+                    let self_message = "";
+                    if (self_message_parent.children.length === 4) {
+                        // console.log(self_message_parent.childre)
+                        self_message = self_message_parent.childNodes[2].textContent;
+                    }
+                    else {
+                        self_message = self_message_parent.childNodes[1].textContent;
+                    }
+
+                    if (document.getElementById("reply-to") === null) {
+                        const reply_to = document.createElement('div');
+                        reply_to.id = 'reply-to';
+                        const reply_to_name = document.createElement('div');
+                        reply_to_name.id = 'reply-to-name';
+                        const reply_to_msg = document.createElement('div');
+                        reply_to_msg.id = 'reply-to-msg';
+                        const reply_to_delete = document.createElement('i');
+                        reply_to_delete.id = 'reply-to-delete';
+                        reply_to_delete.classList.add("fa", "fa-close");
+
+                        reply_to_delete.addEventListener('click', () => {
+                            reply_to.remove();
+                            currentReplyMessageId = null;
+                            targetID = "";
+                        });
+
+                        reply_to_name.textContent = "You";
+                        reply_to_msg.textContent = self_message;
+                        reply_to.appendChild(reply_to_name);
+                        reply_to.appendChild(reply_to_msg);
+                        reply_to.appendChild(reply_to_delete);
+
+                        chat_container.insertBefore(reply_to, form);
+                        currentReplyMessageId = top_level_parentId;
+                    }
+                    else if (top_level_parentId !== currentReplyMessageId) {
+                        let reply_to = document.getElementById("reply-to");
+                        reply_to.remove();
+                        reply_to = document.createElement('div');
+                        reply_to.id = 'reply-to';
+                        const reply_to_name = document.createElement('div');
+                        reply_to_name.id = 'reply-to-name';
+                        const reply_to_msg = document.createElement('div');
+                        reply_to_msg.id = 'reply-to-msg';
+                        const reply_to_delete = document.createElement('i');
+                        reply_to_delete.id = 'reply-to-delete';
+                        reply_to_delete.classList.add("fa", "fa-close");
+
+                        reply_to_delete.addEventListener('click', () => {
+                            reply_to.remove();
+                            currentReplyMessageId = null;
+                            targetID = "";
+                        });
+
+                        reply_to_name.textContent = "You";
+                        reply_to_msg.textContent = self_message;
+                        reply_to.appendChild(reply_to_name);
+                        reply_to.appendChild(reply_to_msg);
+                        reply_to.appendChild(reply_to_delete);
+
+                        chat_container.insertBefore(reply_to, form);
+                        currentReplyMessageId = top_level_parentId;
+                    }
+                });
 
                 chat_delete.addEventListener('click', () => {
                     console.log(userID);
@@ -155,19 +314,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 chat_utils.appendChild(chat_delete);
                 chat_utils.appendChild(chat_reply);
 
-                item.classList.add('message', 'sent', 'enclosed');
+                item.classList.add('message', 'sent');
 
                 item.appendChild(chat_header);
+                item.appendChild(reply);
                 chat_message.textContent = input.value.trim();
                 item.appendChild(chat_message);
                 item.appendChild(chat_utils);
 
-                reply_info.appendChild(replying_to);
-                reply_info.appendChild(reference_message);
-                reply_message.appendChild(item);
-                reply.appendChild(reply_info);
-                reply.appendChild(reply_message);
-                messages.appendChild(reply);
+
+                // reply_info.appendChild(replying_to);
+                // reply_info.appendChild(reference_message);
+                // reply_message.appendChild(item);
+                // reply.appendChild(reply_info);
+                // reply.appendChild(reply_message);
+                messages.appendChild(item);
                 messages.scrollTop = messages.scrollHeight;
             }
 
@@ -177,9 +338,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    socket.on('chat message', (msg, user, reply_receiver, messageId, refmsg, senderid, targetid) => {
+    socket.on('chat message', (msg, user, reply_receiver, messageId, reply_messageid, refmsg, senderid, targetid) => {
         console.log("Checking :", targetid, senderid, userID);
         console.log("Checking :", targetid === userID);
+        const reply_item = document.querySelector(`[data-id="${reply_messageid}"]`);
         if (targetid === "") {
             console.log(targetid, senderid, userID);
 
@@ -187,6 +349,7 @@ document.addEventListener("DOMContentLoaded", () => {
             item.dataset.id = messageId;
             item.dataset.sender = senderid;
             item.dataset.target = targetid;
+            item.setAttribute('tabindex', '0');
             const chat_header = document.createElement('div');
             chat_header.id = "chat-header";
             const chat_name = document.createElement('div');
@@ -289,8 +452,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.log("OK");
                 const reply = document.createElement('div');
                 reply.classList.add("reply", "received");
-                const reply_message = document.createElement('div');
-                reply_message.classList.add("reply-message");
                 const reply_info = document.createElement('div');
                 reply_info.classList.add("reply-info", "received");
                 const replying_to = document.createElement('div');
@@ -302,10 +463,26 @@ document.addEventListener("DOMContentLoaded", () => {
                 // console.log(replying_to.textContent);
                 reference_message.textContent = refmsg;
 
+                reply_info.appendChild(replying_to);
+                reply_info.appendChild(reference_message);
+                reply.appendChild(reply_info);
+
+                reply.addEventListener('click', () => {
+                    if (reply_item !== null && reply_item !== undefined) {
+                        reply_item.focus();
+                        reply_item.classList.add("highlight");
+
+                        setTimeout(() => {
+                            reply_item.classList.remove("highlight");
+                        }, 2000);
+                    }
+                });
+
                 const item = document.createElement('div');
                 item.dataset.id = messageId;
                 item.dataset.sender = senderid;
                 item.dataset.target = targetid;
+                item.setAttribute('tabindex', '0');
                 const chat_header = document.createElement('div');
                 chat_header.id = "chat-header";
                 const chat_name = document.createElement('div');
@@ -394,40 +571,58 @@ document.addEventListener("DOMContentLoaded", () => {
                 chat_header.appendChild(chat_time);
                 chat_utils.appendChild(chat_reply);
 
-                item.classList.add('message', 'received', 'enclosed');
+                item.classList.add('message', 'received');
                 item.appendChild(chat_header);
+                item.appendChild(reply);
                 chat_message.textContent = msg;
                 item.appendChild(chat_message);
                 item.appendChild(chat_utils);
 
-                reply_info.appendChild(replying_to);
-                reply_info.appendChild(reference_message);
-                reply_message.appendChild(item);
-                reply.appendChild(reply_info);
-                reply.appendChild(reply_message);
-                messages.appendChild(reply);
+
+                messages.appendChild(item);
                 messages.scrollTop = messages.scrollHeight;
             }
             else {
+                console.log("Triggered!!");
                 const reply = document.createElement('div');
                 reply.classList.add("reply", "received");
-                const reply_message = document.createElement('div');
-                reply_message.classList.add("reply-message");
                 const reply_info = document.createElement('div');
                 reply_info.classList.add("reply-info", "received");
                 const replying_to = document.createElement('div');
                 replying_to.classList.add("replying-to", "received");
                 const reference_message = document.createElement('div');
-                reference_message.classList.add("reference-message","received");
+                reference_message.classList.add("reference-message", "received");
 
-                replying_to.textContent = reply_receiver;
+                if(targetid !== senderid){
+                    replying_to.textContent = reply_receiver;
+                }
+                else{
+                    replying_to.textContent = user;
+                }
+                
                 // console.log(replying_to.textContent);
                 reference_message.textContent = refmsg;
+
+                reply_info.appendChild(replying_to);
+                reply_info.appendChild(reference_message);
+                reply.appendChild(reply_info);
+
+                reply.addEventListener('click', () => {
+                    if (reply_item !== null && reply_item !== undefined) {
+                        reply_item.focus();
+                        reply_item.classList.add("highlight");
+
+                        setTimeout(() => {
+                            reply_item.classList.remove("highlight");
+                        }, 2000);
+                    }
+                });
 
                 const item = document.createElement('div');
                 item.dataset.id = messageId;
                 item.dataset.sender = senderid;
                 item.dataset.target = targetid;
+                item.setAttribute('tabindex', '0');
                 const chat_header = document.createElement('div');
                 chat_header.id = "chat-header";
                 const chat_name = document.createElement('div');
@@ -516,18 +711,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 chat_header.appendChild(chat_time);
                 chat_utils.appendChild(chat_reply);
 
-                item.classList.add('message', 'received', 'enclosed');
+                item.classList.add('message', 'received');
                 item.appendChild(chat_header);
+                item.appendChild(reply);
                 chat_message.textContent = msg;
                 item.appendChild(chat_message);
                 item.appendChild(chat_utils);
 
-                reply_info.appendChild(replying_to);
-                reply_info.appendChild(reference_message);
-                reply_message.appendChild(item);
-                reply.appendChild(reply_info);
-                reply.appendChild(reply_message);
-                messages.appendChild(reply);
+
+                messages.appendChild(item);
                 messages.scrollTop = messages.scrollHeight;
             }
         }
