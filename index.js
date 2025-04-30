@@ -60,6 +60,15 @@ io.on('connection', (socket) => {
         console.log(userID);
         io.emit("delete message", messageId, userID);
     });
+
+    socket.on('typing', (username) => {
+        socket.broadcast.emit('user typing', username);
+    });
+
+    socket.on('stop typing', (username) => {
+        socket.broadcast.emit('user stopped typing', username);
+    });
+
 });
 
 server.listen(process.env.PORT || 3000, () => {

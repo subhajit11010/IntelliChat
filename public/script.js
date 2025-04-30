@@ -15,6 +15,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let targetID = "";
     let currentReplyMessageId = null; // this is global
     // let reply_messageId = null;
+    let typing = false;
+    let typingTimeout;
     socket.emit('register user', userID);
 
     const chat_container = document.getElementById('chat-container');
@@ -26,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const usernameInput = document.getElementById('usernameInput');
     const usernameSubmit = document.getElementById('usernameSubmit');
     const dateTimeDiv = document.getElementById('date-time');
+    const typing_animation = document.getElementById('typing-indicator');
 
     usernameSubmit.addEventListener('click', () => {
         if (usernameInput.value.trim() !== "") {
@@ -42,8 +45,21 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    input.addEventListener('input', () => {
+        if (!typing) {
+            typing = true;
+            socket.emit('typing', username);
+        }
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+            typing = false;
+            socket.emit('stop typing', username);
+        }, 1500);
+    });
+
     form.addEventListener('submit', (e) => {
         e.preventDefault();
+        socket.emit('stop typing', username);
         if (input.value.trim() !== "") {
             let message_time = new Date();
             message_time = message_time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
@@ -139,6 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         chat_container.insertBefore(reply_to, form);
                         currentReplyMessageId = top_level_parentId;
                     }
+                    input.focus();
                 });
 
                 chat_delete.addEventListener('click', () => {
@@ -294,6 +311,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         chat_container.insertBefore(reply_to, form);
                         currentReplyMessageId = top_level_parentId;
                     }
+                    input.focus();
                 });
 
                 chat_delete.addEventListener('click', () => {
@@ -424,6 +442,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     chat_container.insertBefore(reply_to, form);
                     currentReplyMessageId = top_level_parentId;
                 }
+                input.focus();
 
             });
 
@@ -557,6 +576,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         chat_container.insertBefore(reply_to, form);
                         currentReplyMessageId = top_level_parentId;
                     }
+                    input.focus();
 
                 });
 
@@ -593,13 +613,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 const reference_message = document.createElement('div');
                 reference_message.classList.add("reference-message", "received");
 
-                if(targetid !== senderid){
+                if (targetid !== senderid) {
                     replying_to.textContent = reply_receiver;
                 }
-                else{
+                else {
                     replying_to.textContent = user;
                 }
-                
+
                 // console.log(replying_to.textContent);
                 reference_message.textContent = refmsg;
 
@@ -697,6 +717,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         chat_container.insertBefore(reply_to, form);
                         currentReplyMessageId = top_level_parentId;
                     }
+                    input.focus();
 
                 });
 
@@ -739,6 +760,15 @@ document.addEventListener("DOMContentLoaded", () => {
         notice.textContent = `${user} left the chat`;
         messages.appendChild(notice);
         messages.scrollTop = messages.scrollHeight;
+    });
+
+    socket.on('user typing', (typingUser) => {
+        typing_animation.style.display = 'block';
+        messages.lastChild.focus();
+    });
+
+    socket.on('user stopped typing', (typingUser) => {
+        typing_animation.style.display = 'none';
     });
 
     socket.on("delete message", (messageId, user) => {
